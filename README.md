@@ -17,3 +17,13 @@ The application requires Java 11 or later.
 From the app-code directory run the following command:   
 java -javaagent:../newrelic/newrelic.jar -jar build/libs/app-code-all.jar
 
+Navigate to http://localhost:8080.    
+This results in Page Not loading error page.  
+
+If you look in New Relic Java agent log, you will find several Class Transformer errors like this one:   
+2024-11-12T15:21:58,256-0600 [40070 1] com.newrelic FINE: Unexpected exception thrown in class transformer: jdk.internal.loader.ClassLoaders$AppClassLoader@14899482--io/ktor/client/engine/cio/CIOEngine$1   
+java.lang.ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 1    
+&nbsp;&nbsp;&nbsp;at com.newrelic.agent.deps.org.objectweb.asm.Frame.merge(Frame.java:1280) ~[newrelic.jar:8.15.0]    
+&nbsp;&nbsp;&nbsp;at com.newrelic.agent.deps.org.objectweb.asm.Frame.merge(Frame.java:1255) ~[newrelic.jar:8.15.0]    
+
+Remove the kotlin-suspends.jar from the extensions directory and restart and the Class Transformer errors disappear and the Web Page loads as expected.   

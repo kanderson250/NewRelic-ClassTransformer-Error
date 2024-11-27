@@ -1,29 +1,44 @@
 # NewRelic-ClassTransformer-Error
-The app-code directory contains an simple Ktor/Kotlin application that will generate the Class Transformer error into the New Relic agent log if the kotlin-suspends.jar instrumentation is applied. 
-  
+
+This is a fork of a repro demonstrating a ClassTransformer error that arises with Kotlin Coroutines and the New Relic Java Agent.  
+
+The original project started a Ktor HTTP client. This fork simplifies the code drastically, 
+reproducing the error with a single Kotlin Coroutine and a Suspend Function. 
+
 ## Build Application
 Navigate into the app-code directory.   
 Run the following command to build an application jar    
 ./gradlew clean build     
 
-This will create a jar file named app-code-all.jar in the build/libs directory.   
+This will create a jar file named app-code-all.jar in the build/libs directory.  
+
 
 ## Agent setup
 The New Relic Java Agent agent is included in this repository in the newrelic directory.  It already includes the kotlin-suspends.jar instrumentation module in the extensions directory.    
-The only setup that is needed is to edit newrelic.yml and enter a valid license key.   
+The newrelic.yml file contains a dummy license key, which is sufficient to throw the error.   
 
-## Runnig the application with a New Relic agent
+## kotlin-suspends module
+
+The `instrumentation-code` directory contains the no-op instrumentation source for `invokeSuspend`. This instrumentation
+has already been added to the `newrelic/extensions` directory described above and no further action is needed. 
+
+If you want to modify the instrumentation, cd into `instrumentation-code`, implement your changes, then run `./gradlew clean jar`.
+This will output a new jar named `kotlin-suspends.jar` to the `kotlin-suspends/build/libs` directory.
+
+To use this jar, copy `kotlin-suspends.jar` into the `newrelic/extensions` directory. 
+
+## Running the application with a New Relic agent
 The application requires Java 11 or later.   
 From the app-code directory run the following command:   
 java -javaagent:../newrelic/newrelic.jar -jar build/libs/app-code-all.jar
 
-Navigate to http://localhost:8080.    
-This results in Page Not loading error page.  
-
-If you look in New Relic Java agent log, you will find several Class Transformer errors like this one:   
+If you look in New Relic Java agent log, you will find an error like this one:   
 2024-11-12T15:21:58,256-0600 [40070 1] com.newrelic FINE: Unexpected exception thrown in class transformer: jdk.internal.loader.ClassLoaders$AppClassLoader@14899482--io/ktor/client/engine/cio/CIOEngine$1   
 java.lang.ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 1    
-&nbsp;&nbsp;&nbsp;at com.newrelic.agent.deps.org.objectweb.asm.Frame.merge(Frame.java:1280) ~[newrelic.jar:8.15.0]    
-&nbsp;&nbsp;&nbsp;at com.newrelic.agent.deps.org.objectweb.asm.Frame.merge(Frame.java:1255) ~[newrelic.jar:8.15.0]    
+&nbsp;&nbsp;&nbsp;at com.newrelic.agent.deps.org.objectweb.asm.Frame.merge(Frame.java:1280) ~[newrelic.jar:8.6.0]    
+&nbsp;&nbsp;&nbsp;at com.newrelic.agent.deps.org.objectweb.asm.Frame.merge(Frame.java:1255) ~[newrelic.jar:8.6.0]    
 
-Remove the kotlin-suspends.jar from the extensions directory and restart and the Class Transformer errors disappear and the Web Page loads as expected.   
+Remove the kotlin-suspends.jar from the extensions directory and restart and the Class Transformer errors disappear.
+
+Also, try commenting out the suspend function `doWorld` in `main` and replace it with the otherwise identical, 
+non-suspend function `otherWorld()`. The errors disappear. 

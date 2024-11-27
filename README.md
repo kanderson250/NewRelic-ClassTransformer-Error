@@ -32,7 +32,7 @@ The application requires Java 11 or later.
 From the app-code directory run the following command:   
 java -javaagent:../newrelic/newrelic.jar -jar build/libs/app-code-all.jar
 
-If you look in New Relic Java agent log, you will find an error like this one:   
+If you look in New Relic Java agent log (at `newrelic/logs/newrelic_agent.log`), you will find an error like this one:   
 2024-11-12T15:21:58,256-0600 [40070 1] com.newrelic FINE: Unexpected exception thrown in class transformer: jdk.internal.loader.ClassLoaders$AppClassLoader@14899482--io/ktor/client/engine/cio/CIOEngine$1   
 java.lang.ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 1    
 &nbsp;&nbsp;&nbsp;at com.newrelic.agent.deps.org.objectweb.asm.Frame.merge(Frame.java:1280) ~[newrelic.jar:8.6.0]    

@@ -3,7 +3,7 @@
 This is a fork of a repro demonstrating a ClassTransformer error that arises with Kotlin Coroutines and the New Relic Java Agent.  
 
 ## Build Application
-Navigate into the `app-code` directory.   
+Navigate into the `app-code` directory. It should be built and run with Java 11.   
 Run the following command to build an application jar 
 
 ```
